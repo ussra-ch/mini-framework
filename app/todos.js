@@ -1,4 +1,4 @@
-import { framework } from "../framework/state";
+import { framework } from "../framework/state.js";
 export const store = framework.createStore({
     todos: [],
     route: "all"

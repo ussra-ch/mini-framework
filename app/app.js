@@ -1,6 +1,6 @@
-import { render } from "../framework/render";
-import { createTodoApp ,store} from "./todos";
-import { framework } from "../framework/state";
+import { render } from "../framework/render.js";
+import { createTodoApp ,store} from "./todos.js";
+import { framework } from "../framework/state.js";
 
 const root = document.getElementById('app');
 

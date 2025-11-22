@@ -5,7 +5,6 @@ export function createRealElement(element) {
   }
   const newElement = document.createElement(element.tag) // there is a special tag = text rdi balk mno mn ba3d :)
   const HTMLevents = [] //binma 3raft ach khas ydar bihoum wsafi
-
   if (element.attrs && Object.keys(element.attrs).length > 0) {
     newElement.__listeners__ = [];
     for (const attribute in element.attrs) {
@@ -33,7 +32,6 @@ export function createRealElement(element) {
   if (element.children == undefined || element.children.length == 0) {
     return newElement
   }
-
   element.children.forEach(node => {
     const realChild = createRealElement(node)
     // if (realChild != undefined){

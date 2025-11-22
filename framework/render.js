@@ -1,13 +1,9 @@
 import { createRealElement } from "./core.js";
-let oldTree = null;
 
-export function render(newTree, container) {
-
+export function render(newTree, container,oldTree) {
+    console.log(newTree,container,oldTree);  
     updateElement(container, newTree, oldTree);
-
-    oldTree = newTree;
 }
-
 export function updateElement(parent, newNode, oldNode, index = 0) {
     // support arrays of vnodes
     if (Array.isArray(newNode)) {

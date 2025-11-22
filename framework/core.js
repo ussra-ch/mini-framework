@@ -1,14 +1,14 @@
 // had l function kachd lia l VDOM mn 3and l user wkatkhdm hia b DOm bach trj3o real DOM
-function createRealElement(element) {
-  if (element.tag == 'text') {
-
+export function createRealElement(element) {
+  if (typeof element === "string" || typeof element === "number") {
+    return document.createTextNode(String(element));
   }
   const newElement = document.createElement(element.tag) // there is a special tag = text rdi balk mno mn ba3d :)
   const HTMLevents = [] //binma 3raft ach khas ydar bihoum wsafi
 
   if (element.attrs && Object.keys(element.attrs).length > 0) {
     newElement.__listeners__ = [];
-    for (attribute in element.attrs) {
+    for (const attribute in element.attrs) {
       if (element.attrs.hasOwnProperty(attribute)) {
         if (attribute.startsWith("on")) {
           HTMLevents.push(element.attrs[attribute])

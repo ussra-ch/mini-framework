@@ -1,14 +1,10 @@
 import { framework } from "../framework/state.js";
-export const store = framework.createStore({
-    todos: [],
-    route: "all"
-});
+
 export function createTodoApp() {
     return {
         tag: "div",
         attrs: { class: "container" },
         children: [
-
             {
                 tag: "div",
                 attrs: { class: "todo-app" },

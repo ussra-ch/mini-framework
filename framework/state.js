@@ -22,9 +22,7 @@ export const framework = {
     },
     start() {
       const navigate = () => {
-        const path = window.location.hash || '/';   
-        console.log('Navigating to path:', path);
-         
+        const path = window.location.hash || '/';            
         const renderFn = this.routes.get(path.slice(1)) || this.routes.get('/');
         if (renderFn) {
           renderFn();

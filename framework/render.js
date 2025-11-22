@@ -1,21 +1,29 @@
+import { store } from "../app/todos.js";
 import { createRealElement } from "./core.js";
 
 const eventQueue = [];
-function  getNextExistingElement(newChildren, oldKeyedMap, i, el) {
-      for (let j = i + 1; j < newChildren.length; j++) {
-          const nextNewChild = newChildren[j];
-          const nextKey = (typeof nextNewChild === 'object' && nextNewChild?.attrs?.key) || `_${j}`;
-          
-          if (oldKeyedMap.has(nextKey)) {
-              const existingOldChild = oldKeyedMap.get(nextKey);
-              return existingOldChild.el; 
-          }
-      }
-      return null;
-  }
+function getNextExistingElement(newChildren, oldKeyedMap, i, el) {
+  for (let j = i + 1; j < newChildren.length; j++) {
+    const nextNewChild = newChildren[j];
+    const nextKey = (typeof nextNewChild === 'object' && nextNewChild?.attrs?.key) || `_${j}`;
 
-export function render(newTree, container, oldTree) {
-  updateElement(oldTree, newTree, container);
+    if (oldKeyedMap.has(nextKey)) {
+      const existingOldChild = oldKeyedMap.get(nextKey);
+      return existingOldChild.el;
+    }
+  }
+  return null;
+}
+
+export function render(newTree, container, oldTree, newroot) {
+  if (newroot) {
+    container.innerHTML = ''
+    const element = createRealElement(newTree);
+    container.appendChild(element)
+    store.juststate({ render: false })
+  } else {
+    updateElement(oldTree, newTree, container);
+  }
 }
 function updateElement(oldVNode, newVNode, parent) {
   if (!newVNode) {
@@ -104,7 +112,7 @@ function updateElement(oldVNode, newVNode, parent) {
     const oldHandler = oldEvents[eventType];
     const newHandler = newEvents[eventType];
     if (!newHandler || oldHandler !== newHandler) {
-     eventQueue.push(() => el.removeEventListener(eventType, oldHandler));
+      eventQueue.push(() => el.removeEventListener(eventType, oldHandler));
     }
   });
 
@@ -112,13 +120,13 @@ function updateElement(oldVNode, newVNode, parent) {
     const oldHandler = oldEvents[eventType];
     const newHandler = newEvents[eventType];
     if (!oldHandler || oldHandler !== newHandler) {
-     eventQueue.push(() => el.addEventListener(eventType, newHandler));
+      eventQueue.push(() => el.addEventListener(eventType, newHandler));
     }
   });
 
   queueMicrotask(() => {
-    while (eventQueue &&eventQueue.length > 0) {
-      const fn =eventQueue.shift();
+    while (eventQueue && eventQueue.length > 0) {
+      const fn = eventQueue.shift();
       fn();
     }
   });
@@ -140,7 +148,7 @@ function updateElement(oldVNode, newVNode, parent) {
     const nextSiblingReference = getNextExistingElement(newChildren, oldKeyedMap, i, el);
 
     if (oldChild) {
-     updateElement(oldChild, newChild, el);
+      updateElement(oldChild, newChild, el);
       if (typeof newChild === 'object') {
         realDOMNode = newChild.el;
       } else {

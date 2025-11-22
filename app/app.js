@@ -19,7 +19,7 @@ class App {
     }
 
     renderer(filter) {
-        store.update({route :`${filter}`}) 
+        store.update({ route: `${filter}`,render : true })
     }
     notFoundRenderer() {
         const vnode = {
@@ -32,9 +32,11 @@ class App {
     }
 
     setupRenderer() {
-           store.subscribe((state) => {                        
-            const newnode = createTodoApp(state,state.route);
-            render(newnode, this.root, this.oldVNode);
+        store.subscribe((state) => {
+             console.log(state);
+             
+            const newnode = createTodoApp(state, state.route);
+            render(newnode, this.root, this.oldVNode,state.render);
             this.oldVNode = newnode
 
         });
@@ -44,11 +46,9 @@ class App {
         framework.router.addRoute('', () => this.renderer(''));
         framework.router.addRoute('active', () => this.renderer('active'));
         framework.router.addRoute('completed', () => this.renderer('completed'));
+        framework.router.setNotFound(() => this.notFoundRenderer()); // makaynch dakchi liakt9Alab 3lih
 
-        // set Not Found handler
-        framework.router.setNotFound(() => this.notFoundRenderer());
-
-        framework.router.start();
+        framework.router.start(); // run route
     }
 }
 

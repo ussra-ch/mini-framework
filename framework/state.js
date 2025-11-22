@@ -9,6 +9,10 @@ class Store {
   getState() {
     return this.state;
   }
+  juststate(newState) {
+    this.state = { ...this.state, ...newState };
+
+  }
 
   update(newState) {
     this.state = { ...this.state, ...newState };
@@ -36,7 +40,7 @@ export class Router {
     this.notFoundFn = fn;
   }
 
-  navigate() {  
+  navigate() {
     runEventCleanups();
     const path = window.location.hash.slice(1) || "";
     const renderFn = this.routes.get(path);
@@ -58,7 +62,7 @@ export class Router {
   link(e, route) {
     e.preventDefault();
     console.log(route);
-    
+
     window.location.hash = route;
   }
 }

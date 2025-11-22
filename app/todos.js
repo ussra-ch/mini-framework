@@ -9,12 +9,10 @@ export const store = framework.createStore({
 });
 
 export function createTodoApp(state, filter) {
-  const { todos, editingId } = state;
+  const { todos, editingId  } = state;
 
 
   const filteredTodos = todos.filter((todo) => {
-    console.log(filter);
-
     if (filter === 'active') return !todo.completed;
     if (filter === 'completed') return todo.completed;
     return true;
@@ -33,9 +31,7 @@ export function createTodoApp(state, filter) {
             editingId: null
           });
       }
-    }
-
-      
+      }
     } 
   };
 

@@ -7,7 +7,6 @@ import { store } from "./todos.js";
 class App {
     constructor() {
         this.root = document.getElementById('app');
-      
         this.oldVNode = null;
 
         if (!this.root) {
@@ -20,15 +19,8 @@ class App {
     }
 
     renderer(filter) {
-
-        const state = store.getState();
-        
-        const newnode = createTodoApp(state, filter);
-        console.log(newnode);
-        render(newnode, this.root, this.oldVNode);
-        this.oldVNode = newnode;
+        store.update({route :`${filter}`}) 
     }
-
     notFoundRenderer() {
         const vnode = {
             tag: 'div',
@@ -40,8 +32,11 @@ class App {
     }
 
     setupRenderer() {
-        store.subscribe(() => {
-            framework.router.navigate();
+           store.subscribe((state) => {                        
+            const newnode = createTodoApp(state,state.route);
+            render(newnode, this.root, this.oldVNode);
+            this.oldVNode = newnode
+
         });
     }
 
@@ -57,5 +52,5 @@ class App {
     }
 }
 
- new App();
+new App();
 

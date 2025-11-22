@@ -1,3 +1,5 @@
+import { runEventCleanups } from "./eventRegistry.js";
+
 class Store {
   constructor(initialState) {
     this.state = { ...initialState };
@@ -15,36 +17,42 @@ class Store {
 
   subscribe(cb) {
     this.subscribers.push(cb);
-    cb(this.state); 
+    cb(this.state);
   }
 }
 
-class Router {
+
+export class Router {
   constructor() {
     this.routes = new Map();
+    this.notFoundFn = null;
   }
 
   addRoute(path, renderFn) {
     this.routes.set(path, renderFn);
   }
 
-  navigate() {
-    const path = window.location.hash.slice(1) || '';              
-    const renderFn = this.routes.get(path); 
+  setNotFound(fn) {
+    this.notFoundFn = fn;
+  }
+
+  navigate() {  
+    runEventCleanups();
+    const path = window.location.hash.slice(1) || "";
+    const renderFn = this.routes.get(path);
+
     if (renderFn) {
       renderFn();
+    } else if (this.notFoundFn) {
+      this.notFoundFn();
     } else {
-      // ila route ma kaynach, nrender Not Found
-      if (this.notFoundFn) {
-        this.notFoundFn();
-      } else {
-        console.warn(`Route "${path}" not found`);
-      }
+      console.warn(`Route not found: ${path}`);
     }
   }
+
   start() {
     this.navigate();
-    window.addEventListener('hashchange', this.navigate.bind(this));
+    window.addEventListener("hashchange", this.navigate.bind(this));
   }
 
   link(e, route) {
@@ -53,15 +61,12 @@ class Router {
     
     window.location.hash = route;
   }
-
-  setNotFound(fn) {
-    this.notFoundFn = fn;
-  }
 }
 
 
+
 export const framework = {
-  
+
   createStore(initialState) {
     return new Store(initialState);
   },

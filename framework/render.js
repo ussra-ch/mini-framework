@@ -30,7 +30,6 @@ function updateElement(oldVNode, newVNode, parent) {
     return;
   }
 
-  // TEXT NODES
   if (typeof oldVNode === 'string' || typeof newVNode === 'string' || typeof oldVNode === 'number' || typeof newVNode === 'number') {
     if (oldVNode.toString() !== newVNode.toString()) {
       const newEl = createRealElement(newVNode);

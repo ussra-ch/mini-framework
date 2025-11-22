@@ -1,65 +1,167 @@
 import { createRealElement } from "./core.js";
 
-export function render(newTree, container,oldTree) {
-    console.log(newTree,container,oldTree);  
-    updateElement(container, newTree, oldTree);
+const eventQueue = [];
+function  getNextExistingElement(newChildren, oldKeyedMap, i, el) {
+      for (let j = i + 1; j < newChildren.length; j++) {
+          const nextNewChild = newChildren[j];
+          const nextKey = (typeof nextNewChild === 'object' && nextNewChild?.attrs?.key) || `_${j}`;
+          
+          if (oldKeyedMap.has(nextKey)) {
+              const existingOldChild = oldKeyedMap.get(nextKey);
+              return existingOldChild.el; 
+          }
+      }
+      return null;
+  }
+
+export function render(newTree, container, oldTree) {
+  updateElement(oldTree, newTree, container);
 }
-export function updateElement(parent, newNode, oldNode, index = 0) {
-    // support arrays of vnodes
-    if (Array.isArray(newNode)) {
-        for (let i = 0; i < newNode.length; i++) {
-            const newChild = newNode[i];
-            const oldChild = oldNode ? oldNode[i] : null;
-            updateElement(parent, newChild, oldChild, i);
-        }
-        return;
+function updateElement(oldVNode, newVNode, parent) {
+  if (!newVNode) {
+    if (oldVNode && oldVNode.el) parent.removeChild(oldVNode.el);
+    return;
+  }
+
+  if (!oldVNode) {
+    const el = createRealElement(newVNode);
+    parent.appendChild(el);
+    if (typeof newVNode === 'object') newVNode.el = el;
+    return;
+  }
+
+  // TEXT NODES
+  if (typeof oldVNode === 'string' || typeof newVNode === 'string' || typeof oldVNode === 'number' || typeof newVNode === 'number') {
+    if (oldVNode.toString() !== newVNode.toString()) {
+      const newEl = createRealElement(newVNode);
+      const oldEl = oldVNode.el || parent.firstChild;
+      if (oldEl) {
+        parent.replaceChild(newEl, oldEl);
+      } else {
+        parent.appendChild(newEl);
+      }
     }
-    if (!parent) return;
+    return;
+  }
 
-    const existing = parent.childNodes[index];
+  if (oldVNode.tag !== newVNode.tag) {
+    const newEl = createRealElement(newVNode);
+    parent.replaceChild(newEl, oldVNode.el);
+    newVNode.el = newEl;
+    return;
+  }
 
-    if (changed(newNode, oldNode)) {
-        const newEl = createRealElement(newNode);
-        if (existing) {
-            parent.replaceChild(newEl, existing);
-        } else {
-            parent.appendChild(newEl);
-        }
-        return;
+  const el = oldVNode.el;
+  if (!el) {
+    const newEl = createRealElement(newVNode);
+    parent.appendChild(newEl);
+    newVNode.el = newEl;
+    return;
+  }
+  newVNode.el = el;
+
+  const oldAttrs = oldVNode.attrs || {};
+  const newAttrs = newVNode.attrs || {};
+
+  Object.keys(newAttrs).forEach((key) => {
+    const oldValue = oldAttrs[key];
+    const newValue = newAttrs[key];
+    if (oldValue !== newValue) {
+      if (key === 'checked' || key === 'autofocus' || key === 'selected') {
+        el[key] = !!newValue;
+      } else if (key === 'style' && typeof newValue === 'object') {
+        Object.assign(el.style, newValue);
+      } else if (key === 'htmlFor') {
+        el.setAttribute('for', newValue);
+      } else if (key === 'value') {
+        el.value = newValue || '';
+      } else {
+        el.setAttribute(key, newValue);
+      }
     }
+  });
 
-    updateProps(existing, newNode.props || {}, oldNode?.props || {});
-
-    const newChildren = newNode.children || [];
-    const oldChildren = oldNode?.children || [];
-
-    const max = Math.max(newChildren.length, oldChildren.length);
-    for (let i = 0; i < max; i++) {
-        updateElement(existing, newChildren[i], oldChildren[i], i);
+  Object.keys(oldAttrs).forEach((key) => {
+    if (!(key in newAttrs)) {
+      if (key === 'checked' || key === 'autofocus' || key === 'selected') {
+        el[key] = false;
+      } else if (key === 'style') {
+        el.style.cssText = '';
+      } else if (key === 'htmlFor') {
+        el.removeAttribute('for');
+      } else if (key === 'value') {
+        el.value = '';
+      } else {
+        el.removeAttribute(key);
+      }
     }
+  });
+
+  const oldEvents = oldVNode.events || {};
+  const newEvents = newVNode.events || {};
+
+
+  Object.keys(oldEvents).forEach((eventType) => {
+    const oldHandler = oldEvents[eventType];
+    const newHandler = newEvents[eventType];
+    if (!newHandler || oldHandler !== newHandler) {
+     eventQueue.push(() => el.removeEventListener(eventType, oldHandler));
+    }
+  });
+
+  Object.keys(newEvents).forEach((eventType) => {
+    const oldHandler = oldEvents[eventType];
+    const newHandler = newEvents[eventType];
+    if (!oldHandler || oldHandler !== newHandler) {
+     eventQueue.push(() => el.addEventListener(eventType, newHandler));
+    }
+  });
+
+  queueMicrotask(() => {
+    while (eventQueue &&eventQueue.length > 0) {
+      const fn =eventQueue.shift();
+      fn();
+    }
+  });
+
+  const oldChildren = oldVNode.children || [];
+  const newChildren = newVNode.children || [];
+
+  const oldKeyedMap = new Map();
+  oldChildren.forEach((child, index) => {
+    const key = (typeof child === 'object' && child?.attrs?.key) || `_${index}`;
+    oldKeyedMap.set(key, child);
+  });
+
+  for (let i = 0; i < newChildren.length; i++) {
+    const newChild = newChildren[i];
+    const key = (typeof newChild === 'object' && newChild?.attrs?.key) || `_${i}`;
+    let oldChild = oldKeyedMap.get(key);
+    let realDOMNode = null;
+    const nextSiblingReference = getNextExistingElement(newChildren, oldKeyedMap, i, el);
+
+    if (oldChild) {
+     updateElement(oldChild, newChild, el);
+      if (typeof newChild === 'object') {
+        realDOMNode = newChild.el;
+      } else {
+        realDOMNode = el.childNodes[i];
+      }
+      oldKeyedMap.delete(key);
+      if (realDOMNode && realDOMNode.nextSibling !== nextSiblingReference) {
+        el.insertBefore(realDOMNode, nextSiblingReference);
+      }
+    } else {
+      realDOMNode = createRealElement(newChild);
+      el.insertBefore(realDOMNode, nextSiblingReference);
+    }
+  }
+
+  oldKeyedMap.forEach((oldChild) => {
+    const childEl = oldChild.el;
+    if (childEl && el.contains(childEl)) {
+      el.removeChild(childEl);
+    }
+  });
 }
-export function changed(n1, n2) {
-    return typeof n1 !== typeof n2 ||
-        (typeof n1 === "string" && n1 !== n2) ||
-        n1?.tag !== n2?.tag;
-}
-export function updateProps(el, newProps, oldProps) {
-    if (!el) return;
 
-    // remove old props
-    for (let key in oldProps) {
-        if (!(key in newProps)) {
-            el.removeAttribute(key);
-        }
-    }
-
-    // add/update new props
-    for (let key in newProps) {
-        if (newProps[key] !== oldProps[key]) {
-            // handle class and style specially
-            if (key === 'class') el.className = newProps[key];
-            else if (key === 'style' && typeof newProps[key] === 'object') Object.assign(el.style, newProps[key]);
-            else el.setAttribute(key, newProps[key]);
-        }
-    }
-}

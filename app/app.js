@@ -1,15 +1,13 @@
 import { render } from "../framework/render.js";
 import { createTodoApp } from "./todos.js";
 import { framework } from "../framework/state.js";
+import { store } from "./todos.js";
 
 
 class App {
     constructor() {
         this.root = document.getElementById('app');
-        this.store = framework.createStore({
-            todos: [],
-        });
-
+      
         this.oldVNode = null;
 
         if (!this.root) {
@@ -22,8 +20,11 @@ class App {
     }
 
     renderer(filter) {
-        const state = this.store.getState();
+
+        const state = store.getState();
+        
         const newnode = createTodoApp(state, filter);
+        console.log(newnode);
         render(newnode, this.root, this.oldVNode);
         this.oldVNode = newnode;
     }
@@ -39,7 +40,7 @@ class App {
     }
 
     setupRenderer() {
-        this.store.subscribe(() => {
+        store.subscribe(() => {
             framework.router.navigate();
         });
     }
@@ -56,4 +57,5 @@ class App {
     }
 }
 
-new App();
+ new App();
+

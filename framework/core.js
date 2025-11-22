@@ -1,43 +1,48 @@
 // had l function kachd lia l VDOM mn 3and l user wkatkhdm hia b DOm bach trj3o real DOM
-export function createRealElement(element) {
-  if (typeof element === "string" || typeof element === "number") {
-    return document.createTextNode(String(element));
+export function createRealElement(vNode) {
+  if (typeof vNode === 'string' || typeof vNode === 'number') {
+    const textNode = document.createTextNode(vNode.toString());
+    return textNode;
   }
-  const newElement = document.createElement(element.tag) // there is a special tag = text rdi balk mno mn ba3d :)
-  const HTMLevents = [] //binma 3raft ach khas ydar bihoum wsafi
-  if (element.attrs && Object.keys(element.attrs).length > 0) {
-    newElement.__listeners__ = [];
-    for (const attribute in element.attrs) {
-      if (element.attrs.hasOwnProperty(attribute)) {
-        if (attribute.startsWith("on")) {
-          HTMLevents.push(element.attrs[attribute])
-        } else if (attribute.startsWith("$")) {
-          const event = attribute.slice(1)
-          const func = element.attrs[attribute]
-          if (typeof func === 'function') {
-            newElement.addEventListener(event, func)
-            newElement.__listeners__.push({
-              type: event,
-              handler: func
-            });
-          } else {
-            console.error(`Handler for event ${key} is not a function.`);
-          }
-        } else {
-          newElement.setAttribute(attribute, element.attrs[attribute])
-        }
-      }
+
+  if (!vNode || !vNode.tag) return document.createTextNode('');
+
+  const element = document.createElement(vNode.tag);
+  vNode.el = element;
+
+  const attrs = vNode.attrs || {};
+  Object.keys(attrs).forEach((key) => {
+    const value = attrs[key];
+    if (key === 'checked' || key === 'autofocus' || key === 'selected') {
+      element[key] = !!value;
+    } else if (key === 'style' && typeof value === 'object') {
+      Object.assign(element.style, value);
+    } else if (key === 'htmlFor') {
+      element.setAttribute('for', value);
+    } else if (key === 'value') {
+      element.value = value || '';
+    } else {
+      element.setAttribute(key, value);
     }
-  }
-  if (element.children == undefined || element.children.length == 0) {
-    return newElement
-  }
-  element.children.forEach(node => {
-    const realChild = createRealElement(node)
-    // if (realChild != undefined){
-    newElement.appendChild(realChild)
-    // newElement.push(realChild)
-    // }
   });
-  return newElement
+
+  const events = vNode.events || {};
+  Object.keys(events).forEach((eventType) => {
+    element.addEventListener(eventType, events[eventType]);
+  });
+
+  const children = vNode.children || [];
+  children.forEach((child) => {
+    if (child) {
+      element.appendChild(createRealElement(child));
+    }
+  });
+
+  queueMicrotask(() => {
+    if (vNode.events && typeof vNode.events.mount === 'function') {
+      vNode.events.mount(element);
+    }
+  });
+
+  return element;
 }

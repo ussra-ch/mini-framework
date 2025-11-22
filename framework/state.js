@@ -31,9 +31,6 @@ class Router {
   navigate() {
     const path = window.location.hash.slice(1) || '';              
     const renderFn = this.routes.get(path); 
-    console.log(renderFn,"--*--*-*-*");
-    
-
     if (renderFn) {
       renderFn();
     } else {
@@ -45,14 +42,15 @@ class Router {
       }
     }
   }
-  
   start() {
     this.navigate();
     window.addEventListener('hashchange', this.navigate.bind(this));
   }
-  
+
   link(e, route) {
     e.preventDefault();
+    console.log(route);
+    
     window.location.hash = route;
   }
 

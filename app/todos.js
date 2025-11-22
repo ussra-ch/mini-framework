@@ -1,120 +1,282 @@
 import { framework } from "../framework/state.js";
+import { createElement } from "../framework/createjsx.js";
 
-export function createTodoApp() {
-    return {
-        tag: "div",
-        attrs: { class: "container" },
+
+export const store = framework.createStore({
+  todos: [],
+  editingId: null,
+  route: "all"
+});
+
+export function createTodoApp(state, filter) {
+  const { todos, editingId } = state;
+
+
+  const filteredTodos = todos.filter((todo) => {
+    console.log(filter);
+
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
+    return true;
+  });
+
+  const handleEditInput = (e, todo) => {
+    if (e.key === 'Enter' || e.type === 'blur') {
+      if (e.target.value.trim().length>1){
+
+        const newText = e.target.value.trim();
+        if (newText) {
+          store.update({
+            todos: todos.map(t =>
+              t.id === todo.id ? { ...t, text: newText } : t
+            ),
+            editingId: null
+          });
+      }
+    }
+
+      
+    } 
+  };
+
+  return createElement({
+    tag: 'section',
+    attrs: { class: 'todoapp' },
+    children: [
+      {
+        tag: 'header',
+        attrs: { class: 'header' },
         children: [
-            {
-                tag: "div",
-                attrs: { class: "todo-app" },
-                children: [
-                    {
-                        tag: "section",
-                        attrs: {
-                            class: "todoapp",
-                            id: "root"
-                        },
-                        children: [
-                            {
-                                tag: "header",
-                                attrs: {
-                                    class: "header",
-                                    "data-testid": "header"
-                                },
-                                children: [
-                                    {
-                                        tag: "h1",
-                                        children: ["todos"]
-                                    },
-                                    {
-                                        tag: "div",
-                                        attrs: { class: "input-container" },
-                                        children: [
-                                            {
-                                                tag: "input",
-                                                attrs: {
-                                                    class: "new-todo",
-                                                    id: "todo-input",
-                                                    type: "text",
-                                                    "data-testid": "text-input",
-                                                    placeholder: "What needs to be done?",
-                                                    value: "",
-                                                    autofocus: true,
-                                                    onkeydown: (e) => {
-                                                        addTodo(e)
-
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                tag: "label",
-                                                attrs: {
-                                                    class: "visually-hidden",
-                                                    for: "todo-input"
-                                                },
-                                                children: ["New Todo Input"]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-
-                            {
-                                tag: "main",
-                                attrs: {
-                                    class: "main",
-                                    "data-testid": "main"
-                                },
-                                children: [
-                                    {
-                                        tag: "ul",
-                                        attrs: {
-                                            class: "todo-list",
-                                            "data-testid": "todo-list",
-                                            id: "todo-list"
-                                        },
-                                        children: []
-                                    }
-                                ]
-                            },
-
-
-                        ]
-                    }
-
-
-                ]
+          { tag: 'h1', children: ['todos'] },
+          {
+            tag: 'input',
+            attrs: {
+              class: 'new-todo',
+              placeholder: 'What needs to be done?',
+              autofocus: true
             },
-            {
-                tag: "footer",
-                attrs: { class: "info" },
-                children: [
-                    {
-                        tag: "p",
-                        children: ["Double-click to edit a todo"]
-                    },
-                    {
-                        tag: "p",
-                        children: ["Created by theis Team"]
-                    },
-                    {
-                        tag: "p",
-                        children: [
-
-                            "Part of "
-                            ,
-                            {
-                                tag: "a",
-                                attrs: { href: "https://learn.zone01oujda.ma/intra/oujda/profile?event=41" },
-                                children: ["zone01"]
-                            }
-                        ]
-                    }
-                ]
+            events: {
+              keydown: (e) => {
+                if (e.key === 'Enter' && e.target.value.trim().length>1) {
+                  store.update({
+                    todos: [
+                      ...todos,
+                      {
+                        id: Date.now(),
+                        text: e.target.value.trim(),
+                        completed: false
+                      }
+                    ]
+                  });
+                  e.target.value = '';
+                }
+              }
             }
-
+          }
         ]
-    };
-}
+      },
+      {
+        tag: 'section',
+        attrs: {
+          class: 'main',
+          style: { display: todos.length ? 'block' : 'none' }
+        },
+        children: [
+          {
+            tag: 'input',
+            attrs: {
+              id: 'toggle-all',
+              class: 'toggle-all',
+              type: 'checkbox',
+              checked: todos.length > 0 && todos.every(t => t.completed)
+            },
+            events: {
+              change: (e) => {
+                store.update({
+                  todos: todos.map(t => ({ ...t, completed: e.target.checked }))
+                });
+              }
+            }
+          },
+          {
+            tag: 'label',
+            attrs: { htmlFor: 'toggle-all' },
+            children: ['Mark all as complete']
+          },
+          {
+            tag: 'ul',
+            attrs: { class: 'todo-list' },
+            children: filteredTodos.map(todo => {
 
+              const isEditing = todo.id === editingId;
+
+              let liChildren;
+
+              if (isEditing) {
+                liChildren = [
+                  {
+                    tag: 'input',
+                    attrs: {
+                      class: 'edit',
+                      value: todo.text,
+                      autofocus: true,
+                    },
+                    events: {
+                      mount: (el) => {
+                        el.focus();
+                      },
+                      keydown: (e) => handleEditInput(e, todo),
+                      //keydown: (e) => handleEditInput(e, todo),
+
+                    }
+                  }
+                ];      
+
+              } else {
+                liChildren = [
+                  {
+                    tag: 'div',
+                    attrs: { class: 'view' },
+                    children: [
+                      {
+                        tag: 'input',
+                        attrs: {
+                          class: 'toggle',
+                          type: 'checkbox',
+                          checked: todo.completed
+                        },
+                        events: {
+                          change: () => {
+                            store.update({
+                              todos: todos.map(t =>
+                                t.id === todo.id ? { ...t, completed: !t.completed } : t
+                              )
+                            });
+                          }
+                        }
+                      },
+                      {
+                        tag: 'label',
+                        children: [todo.text || ''],
+                        events: {
+                          dblclick: () => {
+                            store.update({ editingId: todo.id });
+                          }
+                        }
+                      },
+                      {
+                        tag: 'button',
+                        attrs: { class: 'destroy' },
+                        events: {
+                          click: () => {
+                            store.update({
+                              todos: todos.filter(t => t.id !== todo.id)
+                            });
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ];
+              }
+
+              return createElement({
+                tag: 'li',
+                attrs: {
+                  class: `${todo.completed ? 'completed' : ''} ${isEditing ? 'editing' : ''}`,
+                  'data-id': todo.id,
+                  key: todo.id
+                },
+                children: liChildren
+              });
+            })
+          }
+        ]
+      },
+      {
+        tag: 'footer',
+        attrs: {
+          class: 'footer',
+          style: { display: todos.length ? 'block' : 'none' }
+        },
+        children: [
+          {
+            tag: 'span',
+            attrs: { class: 'todo-count' },
+            children: [
+              `${todos.filter(t => !t.completed).length} item${todos.filter(t => !t.completed).length !== 1 ? 's' : ''} left`
+            ]
+          },
+          {
+            tag: 'ul',
+            attrs: { class: 'filters' },
+            children: [
+              {
+                tag: 'li',
+                children: [
+                  {
+                    tag: 'a',
+                    attrs: {
+                      //  href: '/all',
+                      class: filter === 'all' ? 'selected' : ''
+                    },
+                    events: {
+                      click: (e) => framework.router.link(e, '')
+                    },
+                    children: ['All']
+                  }
+                ]
+              },
+              {
+                tag: 'li',
+                children: [
+                  {
+                    tag: 'a',
+                    attrs: {
+                      //   href: '/active',
+                      class: filter === 'active' ? 'selected' : ''
+                    },
+                    events: {
+                      click: (e) => framework.router.link(e, 'active')
+                    },
+                    children: ['Active']
+                  }
+                ]
+              },
+              {
+                tag: 'li',
+                children: [
+                  {
+                    tag: 'a',
+                    attrs: {
+                      //    href: '/completed',
+                      class: filter === 'completed' ? 'selected' : ''
+                    },
+                    events: {
+
+                      click: (e) => framework.router.link(e, 'completed')
+                    },
+                    children: ['Completed']
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            tag: 'button',
+            attrs: {
+              class: 'clear-completed',
+              style: { display: todos.some(t => t.completed) ? 'block' : 'none' }
+            },
+            children: ['Clear completed'],
+            events: {
+              click: () => {
+                store.update({ todos: todos.filter(t => !t.completed) });
+              }
+            }
+          }
+        ]
+      }
+    ]
+  });
+}

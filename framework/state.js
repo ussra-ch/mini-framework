@@ -1,40 +1,72 @@
-export const framework = {
-  createStore(initialState) {
-    let state = { ...initialState };
-    let subscribers = [];
-    return {
-      getState: () => state,
-      update: (newState) => {
-        state = { ...state, ...newState };
-        subscribers.forEach((cb) => cb(state));
-      },
-      subscribe: (cb) => {
-        subscribers.push(cb);
-        cb(state); 
+class Store {
+  constructor(initialState) {
+    this.state = { ...initialState };
+    this.subscribers = [];
+  }
+
+  getState() {
+    return this.state;
+  }
+
+  update(newState) {
+    this.state = { ...this.state, ...newState };
+    this.subscribers.forEach((cb) => cb(this.state));
+  }
+
+  subscribe(cb) {
+    this.subscribers.push(cb);
+    cb(this.state); 
+  }
+}
+
+class Router {
+  constructor() {
+    this.routes = new Map();
+  }
+
+  addRoute(path, renderFn) {
+    this.routes.set(path, renderFn);
+  }
+
+  navigate() {
+    const path = window.location.hash.slice(1) || '';              
+    const renderFn = this.routes.get(path); 
+    console.log(renderFn,"--*--*-*-*");
+    
+
+    if (renderFn) {
+      renderFn();
+    } else {
+      // ila route ma kaynach, nrender Not Found
+      if (this.notFoundFn) {
+        this.notFoundFn();
+      } else {
+        console.warn(`Route "${path}" not found`);
       }
-    };
+    }
+  }
+  
+  start() {
+    this.navigate();
+    window.addEventListener('hashchange', this.navigate.bind(this));
+  }
+  
+  link(e, route) {
+    e.preventDefault();
+    window.location.hash = route;
+  }
+
+  setNotFound(fn) {
+    this.notFoundFn = fn;
+  }
+}
+
+
+export const framework = {
+  
+  createStore(initialState) {
+    return new Store(initialState);
   },
 
-  router: {
-    routes: new Map(),
-    addRoute(path, renderFn) {
-      this.routes.set(path, renderFn);
-    },
-    start() {
-      const navigate = () => {
-        const path = window.location.hash || '/';            
-        const renderFn = this.routes.get(path.slice(1)) || this.routes.get('/');
-        if (renderFn) {
-          renderFn();
-        }
-      };   
-      navigate()
-      window.addEventListener('hashchange', navigate);
-    },
-     link(e,routess){
-          e.preventDefault();
-          window.history.pushState({}, '', `/#${routess}`);
-           this.start();
-}   
-  }
+  router: new Router()
 };

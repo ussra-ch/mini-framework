@@ -19,8 +19,7 @@ export function createTodoApp(state, filter) {
   });
 
   const handleEditInput = (e, todo) => {
-    if (e.key === 'Enter' || e.type === 'blur') {
-      if (e.target.value.trim().length>1){
+    if (e.key === 'Enter' && e.target.value.trim().length>1) {
 
         const newText = e.target.value.trim();
         if (newText) {
@@ -30,7 +29,7 @@ export function createTodoApp(state, filter) {
             ),
             editingId: null
           });
-      }
+      
       }
     } 
   };

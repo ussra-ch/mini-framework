@@ -40,9 +40,23 @@ export class Router {
     this.notFoundFn = fn;
   }
 
+  _getPath() {
+    const hash = window.location.hash;
+    console.log(hash);
+    
+    if (hash.startsWith("#/")) {
+      return hash.slice(2);  
+    }
+
+    return "";
+  }
+
   navigate() {
     runEventCleanups();
-    const path = window.location.hash.slice(1) || "";
+
+    const path = this._getPath();
+    console.log(path);
+     
     const renderFn = this.routes.get(path);
 
     if (renderFn) {
@@ -61,11 +75,10 @@ export class Router {
 
   link(e, route) {
     e.preventDefault();
-    console.log(route);
-
-    window.location.hash = route;
+    window.location.hash = `/${route}`;
   }
 }
+
 
 
 

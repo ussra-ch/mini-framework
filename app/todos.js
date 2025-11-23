@@ -11,7 +11,8 @@ export const store = framework.createStore({
 export function createTodoApp(state, filter) {
   const { todos, editingId  } = state;
 
-
+  console.log(todos);
+  
   const filteredTodos = todos.filter((todo) => {
     if (filter === 'active') return !todo.completed;
     if (filter === 'completed') return todo.completed;
@@ -53,6 +54,8 @@ export function createTodoApp(state, filter) {
             events: {
               keydown: (e) => {
                 if (e.key === 'Enter' && e.target.value.trim().length>1) {
+                  console.log(e,"-----");
+                  
                   store.update({
                     todos: [
                       ...todos,
@@ -83,10 +86,11 @@ export function createTodoApp(state, filter) {
               id: 'toggle-all',
               class: 'toggle-all',
               type: 'checkbox',
-              checked: todos.length > 0 && todos.every(t => t.completed)
+              checked: false
             },
             events: {
-              change: (e) => {
+              change: (e) => {   
+                             
                 store.update({
                   todos: todos.map(t => ({ ...t, completed: e.target.checked }))
                 });
@@ -121,8 +125,6 @@ export function createTodoApp(state, filter) {
                         el.focus();
                       },
                       keydown: (e) => handleEditInput(e, todo),
-                      //keydown: (e) => handleEditInput(e, todo),
-
                     }
                   }
                 ];      
@@ -141,7 +143,7 @@ export function createTodoApp(state, filter) {
                           checked: todo.completed
                         },
                         events: {
-                          change: () => {
+                          change: () => {                            
                             store.update({
                               todos: todos.map(t =>
                                 t.id === todo.id ? { ...t, completed: !t.completed } : t
@@ -180,7 +182,7 @@ export function createTodoApp(state, filter) {
                 attrs: {
                   class: `${todo.completed ? 'completed' : ''} ${isEditing ? 'editing' : ''}`,
                   'data-id': todo.id,
-                  key: todo.id
+                   key: todo.id
                 },
                 children: liChildren
               });
@@ -244,11 +246,9 @@ export function createTodoApp(state, filter) {
                   {
                     tag: 'a',
                     attrs: {
-                      //    href: '/completed',
                       class: filter === 'completed' ? 'selected' : ''
                     },
                     events: {
-
                       click: (e) => framework.router.link(e, 'completed')
                     },
                     children: ['Completed']

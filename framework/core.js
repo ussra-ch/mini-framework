@@ -4,7 +4,6 @@ export function createRealElement(vNode) {
   if (typeof vNode === "string" || typeof vNode === "number") {
     return document.createTextNode(vNode);
   }
-
   if (!vNode || !vNode.tag) return document.createTextNode("");
 
   const element = document.createElement(vNode.tag);

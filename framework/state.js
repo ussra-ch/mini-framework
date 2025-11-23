@@ -40,7 +40,7 @@ export class Router {
     this.notFoundFn = fn;
   }
 
-  _getPath() {
+  getPath() {
     const hash = window.location.hash;
     console.log(hash);
     
@@ -54,7 +54,7 @@ export class Router {
   navigate() {
     runEventCleanups();
 
-    const path = this._getPath();
+    const path = this.getPath();
     console.log(path);
      
     const renderFn = this.routes.get(path);
@@ -64,7 +64,7 @@ export class Router {
     } else if (this.notFoundFn) {
       this.notFoundFn();
     } else {
-      console.warn(`Route not found: ${path}`);
+      console.warn(`route not found here: ${path}`);
     }
   }
 
@@ -78,9 +78,6 @@ export class Router {
     window.location.hash = `/${route}`;
   }
 }
-
-
-
 
 export const framework = {
 

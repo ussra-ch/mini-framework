@@ -30,7 +30,6 @@ function updateElement(oldVNode, newVNode, parent) {
     if (oldVNode && oldVNode.el) parent.removeChild(oldVNode.el);
     return;
   }
-
   if (!oldVNode) {
     const el = createRealElement(newVNode);
     parent.appendChild(el);
@@ -111,7 +110,7 @@ function updateElement(oldVNode, newVNode, parent) {
   Object.keys(oldEvents).forEach((eventType) => {
     const oldHandler = oldEvents[eventType];
     const newHandler = newEvents[eventType];
-    if (!newHandler || oldHandler !== newHandler) {
+  if (!(eventType in newHandler)) {          
       eventQueue.push(() => el.removeEventListener(eventType, oldHandler));
     }
   });
@@ -119,20 +118,23 @@ function updateElement(oldVNode, newVNode, parent) {
   Object.keys(newEvents).forEach((eventType) => {
     const oldHandler = oldEvents[eventType];
     const newHandler = newEvents[eventType];
-    if (!oldHandler || oldHandler !== newHandler) {
+if (!(eventType in oldHandler)){  
       eventQueue.push(() => el.addEventListener(eventType, newHandler));
     }
   });
 
   queueMicrotask(() => {
-    while (eventQueue && eventQueue.length > 0) {
+    while (eventQueue && eventQueue.length > 0) {      
       const fn = eventQueue.shift();
+        
       fn();
     }
   });
 
   const oldChildren = oldVNode.children || [];
   const newChildren = newVNode.children || [];
+  console.log(newChildren);
+  
 
   const oldKeyedMap = new Map();
   oldChildren.forEach((child, index) => {
@@ -150,12 +152,12 @@ function updateElement(oldVNode, newVNode, parent) {
     if (oldChild) {
       updateElement(oldChild, newChild, el);
       if (typeof newChild === 'object') {
-        realDOMNode = newChild.el;
+        realDOMNode = newChild.el;        
       } else {
         realDOMNode = el.childNodes[i];
       }
       oldKeyedMap.delete(key);
-      if (realDOMNode && realDOMNode.nextSibling !== nextSiblingReference) {
+      if (realDOMNode && realDOMNode.nextSibling !== nextSiblingReference) {        
         el.insertBefore(realDOMNode, nextSiblingReference);
       }
     } else {

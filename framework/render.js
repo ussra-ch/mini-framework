@@ -58,14 +58,13 @@ function updateElement(oldVNode, newVNode, parent) {
   }
 
   const el = oldVNode.el;
-  if (!el) {
+  if (!el) {    
     const newEl = createRealElement(newVNode);
     parent.appendChild(newEl);
     newVNode.el = newEl;
     return;
   }
   newVNode.el = el;
-
   const oldAttrs = oldVNode.attrs || {};
   const newAttrs = newVNode.attrs || {};
 
@@ -125,17 +124,13 @@ if (!(eventType in oldHandler)){
 
   queueMicrotask(() => {
     while (eventQueue && eventQueue.length > 0) {      
-      const fn = eventQueue.shift();
-        
+      const fn = eventQueue.shift();    
       fn();
     }
   });
 
   const oldChildren = oldVNode.children || [];
   const newChildren = newVNode.children || [];
-  console.log(newChildren);
-  
-
   const oldKeyedMap = new Map();
   oldChildren.forEach((child, index) => {
     const key = (typeof child === 'object' && child?.attrs?.key) || `_${index}`;

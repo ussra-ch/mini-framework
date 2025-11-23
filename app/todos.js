@@ -11,7 +11,6 @@ export const store = framework.createStore({
 export function createTodoApp(state, filter) {
   const { todos, editingId  } = state;
 
-  console.log(todos);
   
   const filteredTodos = todos.filter((todo) => {
     if (filter === 'active') return !todo.completed;
@@ -53,9 +52,7 @@ export function createTodoApp(state, filter) {
             },
             events: {
               keydown: (e) => {
-                if (e.key === 'Enter' && e.target.value.trim().length>1) {
-                  console.log(e,"-----");
-                  
+                if (e.key === 'Enter' && e.target.value.trim().length>1) {                  
                   store.update({
                     todos: [
                       ...todos,

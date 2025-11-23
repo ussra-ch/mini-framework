@@ -9,7 +9,6 @@ export function registerDomEvent(element, type, handler) {
   });
   
 }
-
 export function runEventCleanups() {
  eventRegistry.forEach(fn => fn());
   eventRegistry.clear();

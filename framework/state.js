@@ -41,9 +41,7 @@ export class Router {
   }
 
   getPath() {
-    const hash = window.location.hash;
-    console.log(hash);
-    
+    const hash = window.location.hash;    
     if (hash.startsWith("#/")) {
       return hash.slice(2);  
     }
@@ -54,9 +52,7 @@ export class Router {
   navigate() {
     runEventCleanups();
 
-    const path = this.getPath();
-    console.log(path);
-     
+    const path = this.getPath();     
     const renderFn = this.routes.get(path);
 
     if (renderFn) {

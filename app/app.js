@@ -32,9 +32,7 @@ class App {
     }
 
     setupRenderer() {
-        store.subscribe((state) => {
-             console.log(state);
-             
+        store.subscribe((state) => {             
             const newnode = createTodoApp(state, state.route);
             render(newnode, this.root, this.oldVNode,state.render);
             this.oldVNode = newnode

@@ -5,7 +5,6 @@ export function createRealElement(vNode) {
     return document.createTextNode(vNode);
   }
   if (!vNode || !vNode.tag) return document.createTextNode("");
-
   const element = document.createElement(vNode.tag);
   vNode.el = element;
 

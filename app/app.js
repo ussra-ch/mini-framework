@@ -19,7 +19,12 @@ class App {
     }
 
     renderer(filter) {
-        store.update({ route: `${filter}`,render : true })
+        const state = store.getState()
+        if (filter!= state.route ){
+            console.log(323232232323);
+            
+            store.update({ route: `${filter}`,render : true })
+        }
     }
     notFoundRenderer() {
         const vnode = {

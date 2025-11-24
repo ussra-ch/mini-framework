@@ -147,7 +147,7 @@ export function createTodoApp(state, filter) {
                 tag: 'ul',
                 attrs: { class: 'filters' },
                 children: [
-                  { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === 'all' ? 'selected' : '' }, events: { click: e => framework.router.link(e, '') }, children: ['All'] }] },
+                  { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === '' ? 'selected' : '' }, events: { click: e => framework.router.link(e, '') }, children: ['All'] }] },
                   { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === 'active' ? 'selected' : '' }, events: { click: e => framework.router.link(e, 'active') }, children: ['Active'] }] },
                   { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === 'completed' ? 'selected' : '' }, events: { click: e => framework.router.link(e, 'completed') }, children: ['Completed'] }] }
                 ]

@@ -46,7 +46,10 @@ export function createTodoApp(state, filter) {
         children: [
           {
             tag: 'header',
-            attrs: { class: 'header' },
+            attrs: {
+              class: 'header',
+              "data-test-id": "header"
+            },
             children: [
               { tag: 'h1', children: ['todos'] },
               {
@@ -54,7 +57,10 @@ export function createTodoApp(state, filter) {
                 attrs: {
                   class: 'new-todo',
                   placeholder: 'What needs to be done?',
-                  autofocus: true
+                  autofocus: true,
+                  id: 'todo-input',
+                  type: 'text',
+                  data_testid: "text-input"
                 },
                 events: {
                   keydown: (e) => {
@@ -80,10 +86,11 @@ export function createTodoApp(state, filter) {
             tag: 'section',
             attrs: {
               class: 'main',
+              data_testid: "main"
             },
             children: [
 
-             ... (todos.length > 0
+              ... (todos.length > 0
                 ? [
                   {
                     tag: 'input',
@@ -91,6 +98,7 @@ export function createTodoApp(state, filter) {
                       id: 'toggle-all',
                       class: 'toggle-all',
                       type: 'checkbox',
+                      data_testid: "toggle-all",
                       checked: todos.length > 0 && todos.every(t => t.completed)
                     },
                     events: {
@@ -103,6 +111,7 @@ export function createTodoApp(state, filter) {
                   },
                   {
                     tag: 'label',
+                    class: 'toggle-all-label',
                     attrs: { htmlFor: 'toggle-all' },
                     children: ['Mark all as complete']
                   }
@@ -111,7 +120,7 @@ export function createTodoApp(state, filter) {
 
               {
                 tag: 'ul',
-                attrs: { class: 'todo-list' },
+                attrs: { class: 'todo-list', data_testid: "todo-list" },
                 children: filteredTodos.map(todo => {
 
                   const isEditing = todo.id === editingId;
@@ -198,7 +207,7 @@ export function createTodoApp(state, filter) {
             ]
           },
 
-          (filteredTodos.length > 0) && ({
+          (todos.length > 0) && ({
             tag: 'footer',
             attrs: {
               class: 'footer',

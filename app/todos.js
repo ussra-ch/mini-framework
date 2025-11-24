@@ -83,7 +83,7 @@ export function createTodoApp(state, filter) {
               id: 'toggle-all',
               class: 'toggle-all',
               type: 'checkbox',
-              checked: false
+              checked: todos.length > 0 && todos.every(t => t.completed)
             },
             events: {
               change: (e) => {   

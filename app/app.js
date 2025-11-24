@@ -21,9 +21,8 @@ class App {
     renderer(filter) {
         const state = store.getState()
         if (filter!= state.route ){
-            console.log(323232232323);
             
-            store.update({ route: `${filter}`,render : true })
+            store.update({ route: `${filter}`,render : false })
         }
     }
     notFoundRenderer() {

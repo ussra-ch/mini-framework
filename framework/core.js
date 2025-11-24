@@ -21,6 +21,7 @@ export function createRealElement(vNode) {
       element.setAttribute("for", value);
     } else if (key === "value") {
       element.value = value || "";
+      element.setAttribute("value", value || "");
     } else {
       element.setAttribute(key, value);
     }

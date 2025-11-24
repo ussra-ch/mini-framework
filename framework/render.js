@@ -80,6 +80,7 @@ function updateElement(oldVNode, newVNode, parent) {
         el.setAttribute('for', newValue);
       } else if (key === 'value') {
         el.value = newValue || '';
+        el.setAttribute('value', newValue || '');
       } else {
         el.setAttribute(key, newValue);
       }

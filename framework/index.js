@@ -3,23 +3,27 @@ import { addRoute, push, router } from "./route.js";
 import { setState } from "./state.js";
 import { mount } from "./createjsx.js";
 
-export const freamwork = {
-    state: {},
-    setState,
+class Framework {
+    constructor(rootId = "app") {
+        this.state = {};
+        this.parent = document.getElementById(rootId);
 
-    OldDOM: null,
-    newDOM: null,
-    parent: document.getElementById('app'),
+        this.OldDOM = null;
+        this.newDOM = null;
 
-    render,
-    mount,
+        // APIs
+        this.render = render;
+        this.mount = mount;
+        this.setState = setState;
 
-    routes: {},
-    addRoute,
-    router,
-    push,
-};
+        // Router
+        this.routes = {};
+        this.addRoute = addRoute;
+        this.router = router;
+        this.push = push;
 
+        window.addEventListener("hashchange", () => this.router());
+    }
+}
 
-// Initialize router
-window.addEventListener("hashchange", () => freamwork.router());
+export const framework = new Framework();

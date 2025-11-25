@@ -9,9 +9,9 @@ export function router() {
     
     if (component) {        
         freamwork.newDOM = component
-         newDom = freamwork.newDOM();
-         render( newDOM, freamwork.parent, freamwork.OldDOM);
-        freamwork.OldDOM = newDOM
+         const newDom = freamwork.newDOM();
+         render( newDom, freamwork.parent, freamwork.OldDOM);
+        freamwork.OldDOM = newDom
     }
 };
 

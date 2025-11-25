@@ -26,4 +26,4 @@ class Framework {
     }
 }
 
-export const framework = new Framework();
+export const freamwork = new Framework();

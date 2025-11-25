@@ -1,27 +1,56 @@
-
-import { freamwork} from "./index.js";
+import { freamwork } from "./index.js";
 import { render } from "./render.js";
 
+let isRenderScheduled = false;
 
-// Handle navigation
-export function router() {
-    const component = freamwork.routes[window.location.hash.slice(2) || ''];
+function flushRouterRender() {
+    isRenderScheduled = false;
     
-    if (component) {        
-        freamwork.newDOM = component
-         const newDom = freamwork.newDOM();
-         render( newDom, freamwork.parent, freamwork.OldDOM);
-        freamwork.OldDOM = newDom
+    const path = window.location.hash.slice(2) || freamwork.defaultRoute || '';
+    const componentCreator = freamwork.routes[path];
+    
+    if (componentCreator) { 
+        freamwork.newDOM = componentCreator; 
+        
+        const newDom = freamwork.newDOM();
+        
+        render(newDom, freamwork.parent, freamwork.OldDOM);
+        
+        freamwork.OldDOM = newDom;
+    } else {
+        console.error(`Route not found for path: /${path}`);
     }
+}
+
+function enqueueRender() {
+    if (!isRenderScheduled) {
+        isRenderScheduled = true;
+        setTimeout(flushRouterRender, 0); 
+    }
+}
+
+export function router() {    
+    enqueueRender(); 
 };
 
-
 export function addRoute(path, component) {
+    if (typeof component !== 'function') {
+        console.error(`Error: Component for path '${path}' must be a function.`);
+        return;
+    }
     freamwork.routes[path] = component;
 };
 
-
 export const push = (path) => {
-    window.location.hash = `#/${path}`;
-    router()
+    const newHash = `#/${path}`;
+     window.location.hash = newHash;    
+}
+
+export function initRouter() {
+const component = freamwork.routes[window.location.hash.slice(2) || freamwork.defaultRoute]; ;
+if (component) {    
+    freamwork.mount(component);
+}           
+  window.addEventListener("hashchange",  router);
+
 }

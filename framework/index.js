@@ -17,12 +17,12 @@ class Framework {
         this.setState = setState;
 
         // Router
+        this.defaultRoute = '';
         this.routes = {};
         this.addRoute = addRoute;
         this.router = router;
         this.push = push;
 
-        window.addEventListener("hashchange", () => this.router());
     }
 }
 

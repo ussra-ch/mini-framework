@@ -1,5 +1,6 @@
 import { freamwork } from "../framework/index.js"
 import { createTodoApp } from "./todos.js"
+import {initRouter} from "../framework/route.js"
 
 
 freamwork.state = {
@@ -14,16 +15,11 @@ freamwork.addRoute('', createTodoApp("all"))
 freamwork.addRoute('active', createTodoApp("active"))
 freamwork.addRoute('completed', createTodoApp("completed"))
 freamwork.addRoute('notfound', () => {
-    return freamwork.createElement("div", {}, ["error 404"])
+    return freamwork.createElement("div", {}, ["404"])
 })
+initRouter()
 
 
 
-const component = freamwork.routes[window.location.hash] ;
-if (component) {
-    console.log(component);
-    
-    freamwork.mount(component);
-}
 
 

@@ -1,15 +1,12 @@
-import { framework } from "../framework/state.js";
 import { createElement } from "../framework/createjsx.js";
+import { freamwork } from "../framework/index.js";
 
-export const store = framework.createStore({
-  todos: [],
-  editingId: null,
-  newTodoText: '',
-  route: "all"
-});
 
-export function createTodoApp(state, filter) {
-  const { todos, editingId, newTodoText } = state;
+
+export function createTodoApp( filter) {
+
+  return () =>{
+  const { todos, editingId, newTodoText } = freamwork.state;
 
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
@@ -19,7 +16,7 @@ export function createTodoApp(state, filter) {
 
   const handleEditInput = (e, todo) => {
     if (e.key === 'Enter' && e.target.value.trim().length > 0) {
-      store.update({
+      freamwork.setState({
         todos: todos.map(t => t.id === todo.id ? { ...t, text: e.target.value.trim() } : t),
         editingId: null
       });
@@ -52,11 +49,11 @@ export function createTodoApp(state, filter) {
                 },
                 events: {
                   input: (e) => {
-                    store.update({ newTodoText: e.target.value });
+                    freamwork.setState({ newTodoText: e.target.value });
                   },
                   keydown: (e) => {
                     if (e.key === 'Enter' && e.target.value.trim().length > 0) {
-                      store.update({
+                      freamwork.setState({
                         todos: [
                           ...todos,
                           { id: Date.now(), text: e.target.value.trim(), completed: false }
@@ -84,7 +81,7 @@ export function createTodoApp(state, filter) {
                     checked: todos.every(t => t.completed)
                   },
                   events: {
-                    change: (e) => store.update({ todos: todos.map(t => ({ ...t, completed: e.target.checked })) })
+                    change: (e) => freamwork.setState({ todos: todos.map(t => ({ ...t, completed: e.target.checked })) })
                   }
                 },
                 { tag: 'label', class: 'toggle-all-label', attrs: { htmlFor: 'toggle-all' }, children: ['Mark all as complete'] }
@@ -104,7 +101,7 @@ export function createTodoApp(state, filter) {
                         mount: el => el.focus(),
                         input: e => {
                           const newText = e.target.value;
-                          store.update({ todos: todos.map(t => t.id === todo.id ? { ...t, text: newText } : t) });
+                          freamwork.setState({ todos: todos.map(t => t.id === todo.id ? { ...t, text: newText } : t) });
                         },
                         keydown: e => handleEditInput(e, todo)
                       }
@@ -117,17 +114,17 @@ export function createTodoApp(state, filter) {
                         {
                           tag: 'input',
                           attrs: { class: 'toggle', type: 'checkbox', checked: todo.completed },
-                          events: { change: () => store.update({ todos: todos.map(t => t.id === todo.id ? { ...t, completed: !t.completed } : t) }) }
+                          events: { change: () => freamwork.setState({ todos: todos.map(t => t.id === todo.id ? { ...t, completed: !t.completed } : t) }) }
                         },
                         {
                           tag: 'label',
                           children: [todo.text || ''],
-                          events: { dblclick: () => store.update({ editingId: todo.id }) }
+                          events: { dblclick: () => freamwork.setState({ editingId: todo.id }) }
                         },
                         {
                           tag: 'button',
                           attrs: { class: 'destroy' },
-                          events: { click: () => store.update({ todos: todos.filter(t => t.id !== todo.id) }) }
+                          events: { click: () => freamwork.setState({ todos: todos.filter(t => t.id !== todo.id) }) }
                         }
                       ]
                     }];
@@ -147,12 +144,12 @@ export function createTodoApp(state, filter) {
                 tag: 'ul',
                 attrs: { class: 'filters' },
                 children: [
-                  { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === '' ? 'selected' : '' }, events: { click: e => framework.router.link(e, '') }, children: ['All'] }] },
-                  { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === 'active' ? 'selected' : '' }, events: { click: e => framework.router.link(e, 'active') }, children: ['Active'] }] },
-                  { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === 'completed' ? 'selected' : '' }, events: { click: e => framework.router.link(e, 'completed') }, children: ['Completed'] }] }
+                  { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === '' ? 'selected' : '' }, events: { click: e => freamwork.push("") }, children: ['All'] }] },
+                  { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === 'active' ? 'selected' : '' }, events: { click: e => freamwork.push( 'active') }, children: ['Active'] }] },
+                  { tag: 'li', children: [{ tag: 'a', attrs: { class: filter === 'completed' ? 'selected' : '' }, events: { click: e => freamwork.push('completed') }, children: ['Completed'] }] }
                 ]
               },
-              { tag: 'button', attrs: { class: 'clear-completed' }, children: ['Clear completed'], events: { click: () => store.update({ todos: todos.filter(t => !t.completed) }) } }
+              { tag: 'button', attrs: { class: 'clear-completed' }, children: ['Clear completed'], events: { click: () => freamwork.setState({ todos: todos.filter(t => !t.completed) }) } }
             ]
           }] : [])
         ]
@@ -168,4 +165,5 @@ export function createTodoApp(state, filter) {
       }
     ]
   });
+}
 }

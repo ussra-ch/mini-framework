@@ -1,4 +1,3 @@
-import { store } from "../app/todos.js";
 import { createRealElement } from "./core.js";
 
 const eventQueue = [];
@@ -15,15 +14,10 @@ function getNextExistingElement(newChildren, oldKeyedMap, i, el) {
   return null;
 }
 
-export function render(newTree, container, oldTree, newroot) {
-  if (newroot) {
-    container.innerHTML = ''
-    const element = createRealElement(newTree);
-    container.appendChild(element)
-    store.juststate({ render: false })
-  } else {
+export function render(newTree, container, oldTree=null) { 
+  console.log(oldTree);
+  
     updateElement(oldTree, newTree, container);
-  }
 }
 function updateElement(oldVNode, newVNode, parent) {
   if (!newVNode) {

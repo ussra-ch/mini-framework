@@ -71,75 +71,81 @@ export function createTodoApp(filter) {
                             ]
                         },
                         {
-                            tag: 'section',
+                            tag: 'main',
                             attrs: { class: 'main', data_testid: "main" },
                             children: [
-                                ...(filteredTodos.length > 0 ? [
-                                    {
-                                        tag: 'input',
-                                        attrs: {
-                                            id: 'toggle-all',
-                                            class: 'toggle-all-container',
-                                            type: 'checkbox',
-                                            data_testid: "toggle-all",
-                                            checked: todos.every(t => t.completed)
-                                        },
-                                        events: {
-                                            change: (e) => freamwork.setState({ todos: todos.map(t => ({ ...t, completed: e.target.checked })) })
-                                        }
-                                    },
-                                    { tag: 'label', class: 'toggle-all-label', attrs: { htmlFor: 'toggle-all' }, children: ['Mark all as complete'] }
-                                ] : []),
-                                {
-                                    tag: 'ul',
-                                    attrs: { class: 'todo-list', data_testid: "todo-list" },
-                                    children: filteredTodos.map(todo => {
-                                        const isEditing = todo.id === editingId;
-
-                                        let liChildren;
-                                        if (isEditing) {
-                                            liChildren = [{
-                                                tag: 'input',
-                                                attrs: { class: 'edit', value: todo.text, autofocus: true },
-                                                events: {
-                                                    mount: el => el.focus(),
-                                                    keydown: e => handleEditInput(e, todo),
-                                                    blur: e => {
-                                                        setTimeout(() => {
-                                                            freamwork.setState({ editingId: null });
-                                                        }, 0)
-                                                    },
-
-                                                }
-                                            }];
-                                        } else {
-                                            liChildren = [{
-                                                tag: 'div',
-                                                attrs: { class: 'view' },
-                                                children: [
-                                                    {
-                                                        tag: 'input',
-                                                        attrs: { class: 'toggle', type: 'checkbox',"data-testid": 'todo-item-toggle', checked: todo.completed },
-                                                        events: { change: () => freamwork.setState({ todos: todos.map(t => t.id === todo.id ? { ...t, completed: !t.completed } : t) }) }
-                                                    },
-                                                    {
-                                                        tag: 'label',
-                                                        attrs: {"data-testid": "todo-item-label"},
-                                                        children: [todo.text || ''],
-                                                        events: { dblclick: () => freamwork.setState({ editingId: todo.id }) }
-                                                    },
-                                                    {
-                                                        tag: 'button',
-                                                        attrs: { class: 'destroy', "data-testid": "todo-item-button" },
-                                                        events: { click: () => freamwork.setState({ todos: todos.filter(t => t.id !== todo.id) }) }
-                                                    }
-                                                ]
-                                            }];
-                                        }
-
-                                        return createElement({ tag: 'li', attrs: { class: `${todo.completed ? 'completed' : ''} ${isEditing ? 'editing' : ''}`, 'data-id': todo.id, key: todo.id }, children: liChildren });
-                                    })
+                                {tag : 'div',
+                                  attrs: {class: "toggle-all-container"},
+                                  children:[
+                                    ...(filteredTodos.length > 0 ? [
+                                      {
+                                          tag: 'input',
+                                          attrs: {
+                                              id: 'toggle-all',
+                                              class: 'toggle-all-container',
+                                              type: 'checkbox',
+                                              data_testid: "toggle-all",
+                                              checked: todos.every(t => t.completed)
+                                          },
+                                          events: {
+                                              change: (e) => freamwork.setState({ todos: todos.map(t => ({ ...t, completed: e.target.checked })) })
+                                          }
+                                      },
+                                      { tag: 'label', class: 'toggle-all-label', attrs: { htmlFor: 'toggle-all' }, children: ['Mark all as complete'] }
+                                  ] : []),
+                                  {
+                                      tag: 'ul',
+                                      attrs: { class: 'todo-list', data_testid: "todo-list" },
+                                      children: filteredTodos.map(todo => {
+                                          const isEditing = todo.id === editingId;
+  
+                                          let liChildren;
+                                          if (isEditing) {
+                                              liChildren = [{
+                                                  tag: 'input',
+                                                  attrs: { class: 'edit', value: todo.text, autofocus: true },
+                                                  events: {
+                                                      mount: el => el.focus(),
+                                                      keydown: e => handleEditInput(e, todo),
+                                                      blur: e => {
+                                                          setTimeout(() => {
+                                                              freamwork.setState({ editingId: null });
+                                                          }, 0)
+                                                      },
+  
+                                                  }
+                                              }];
+                                          } else {
+                                              liChildren = [{
+                                                  tag: 'div',
+                                                  attrs: { class: 'view' },
+                                                  children: [
+                                                      {
+                                                          tag: 'input',
+                                                          attrs: { class: 'toggle', type: 'checkbox',"data-testid": 'todo-item-toggle', checked: todo.completed },
+                                                          events: { change: () => freamwork.setState({ todos: todos.map(t => t.id === todo.id ? { ...t, completed: !t.completed } : t) }) }
+                                                      },
+                                                      {
+                                                          tag: 'label',
+                                                          attrs: {"data-testid": "todo-item-label"},
+                                                          children: [todo.text || ''],
+                                                          events: { dblclick: () => freamwork.setState({ editingId: todo.id }) }
+                                                      },
+                                                      {
+                                                          tag: 'button',
+                                                          attrs: { class: 'destroy', "data-testid": "todo-item-button" },
+                                                          events: { click: () => freamwork.setState({ todos: todos.filter(t => t.id !== todo.id) }) }
+                                                      }
+                                                  ]
+                                              }];
+                                          }
+  
+                                          return createElement({ tag: 'li', attrs: { class: `${todo.completed ? 'completed' : ''} ${isEditing ? 'editing' : ''}`, 'data-id': todo.id, key: todo.id, 'data-testid': "todo-item" }, children: liChildren });
+                                      })
+                                  }
+                                  ]
                                 }
+
                             ]
                         },
                         ...(todos.length > 0 ? [{

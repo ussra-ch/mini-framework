@@ -82,7 +82,7 @@ export function createTodoApp(filter) {
                                           tag: 'input',
                                           attrs: {
                                               id: 'toggle-all',
-                                              class: 'toggle-all-container',
+                                              class: 'toggle-all',
                                               type: 'checkbox',
                                               data_testid: "toggle-all",
                                               checked: todos.every(t => t.completed)

@@ -36,7 +36,6 @@ export function setState(newStateOrFn) {
     } else {
         newState = newStateOrFn;
     }
-
     if (!newState || typeof newState !== 'object') {
         console.error("setState: The new state must be an object or a function returning an object.");
         return; 
@@ -46,3 +45,4 @@ export function setState(newStateOrFn) {
 
     setTimeout(flushStateQueue, 0); 
 }
+

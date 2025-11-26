@@ -8,15 +8,9 @@ freamwork.state = {
     editingId: null,
     newTodoText: '',
 }
-console.log(12112);
-
-
 freamwork.addRoute('', createTodoApp(""))
 freamwork.addRoute('active', createTodoApp("active"))
 freamwork.addRoute('completed', createTodoApp("completed"))
-// freamwork.addRoute('notfound', () => {
-//     return freamwork.createElement("div", {}, ["404"])
-// })
 initRouter()
 
 

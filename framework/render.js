@@ -5,7 +5,6 @@ function getNextExistingElement(newChildren, oldKeyedMap, i, el) {
   for (let j = i + 1; j < newChildren.length; j++) {
     const nextNewChild = newChildren[j];
     const nextKey = (typeof nextNewChild === 'object' && nextNewChild?.attrs?.key) || `_${j}`;
-
     if (oldKeyedMap.has(nextKey)) {
       const existingOldChild = oldKeyedMap.get(nextKey);
       return existingOldChild.el;
@@ -25,7 +24,7 @@ function updateElement(oldVNode, newVNode, parent) {
   if (!oldVNode) {
     const el = createRealElement(newVNode);
     parent.appendChild(el);
-    if (typeof newVNode === 'object') newVNode.el = el;
+    if (typeof newVNode === 'object') newVNode.el = el;    
     return;
   }
 

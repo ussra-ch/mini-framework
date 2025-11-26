@@ -4,9 +4,9 @@ import { setState } from "./state.js";
 import { mount } from "./createjsx.js";
 
 class Framework {
-    constructor(rootId = "app") {
+    constructor() {
         this.state = {};
-        this.parent = document.getElementById(rootId);
+        this.parent = document.getElementById("app");
 
         this.OldDOM = null;
         this.newDOM = null;

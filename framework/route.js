@@ -5,20 +5,15 @@ import { notfound } from "../app/notfound.js";
 let isRenderScheduled = false;
 
 function flushRouterRender() {
-    isRenderScheduled = false;
-    
+    isRenderScheduled = false; 
     const path = window.location.hash.slice(2) || freamwork.defaultRoute || '';
     const componentCreator = freamwork.routes[path] || notfound;
     
     
     if (componentCreator) { 
-        freamwork.newDOM = componentCreator;
-         
-        
-        const newDom = freamwork.newDOM();
-        
-        render(newDom, freamwork.parent, freamwork.OldDOM);
-        
+        freamwork.newDOM = componentCreator;    
+        const newDom = freamwork.newDOM();      
+        render(newDom, freamwork.parent, freamwork.OldDOM); 
         freamwork.OldDOM = newDom;
     } else {
         console.error(`Route not found for path: /${path}`);

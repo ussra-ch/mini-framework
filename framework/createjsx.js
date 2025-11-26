@@ -10,5 +10,4 @@ import { freamwork } from "./index.js";
    freamwork.OldDOM = vDom;
    freamwork.parent.innerHTML = ""
    freamwork.render(vDom, freamwork.parent);
-
 };

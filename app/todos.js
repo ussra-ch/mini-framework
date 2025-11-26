@@ -29,11 +29,11 @@ export function createTodoApp(filter) {
             children: [
                 {
                     tag: 'section',
-                    attrs: { class: 'todoapp' },
+                    attrs: { class: 'todoapp', id : 'root'},
                     children: [
                         {
                             tag: 'header',
-                            attrs: { class: 'header', "data-test-id": "header" },
+                            attrs: { class: 'header', "data-testid": "header" },
                             children: [
                                 { tag: 'h1', children: ['todos'] },
                                 {
@@ -119,17 +119,18 @@ export function createTodoApp(filter) {
                                                 children: [
                                                     {
                                                         tag: 'input',
-                                                        attrs: { class: 'toggle', type: 'checkbox', checked: todo.completed },
+                                                        attrs: { class: 'toggle', type: 'checkbox',"data-testid": 'todo-item-toggle', checked: todo.completed },
                                                         events: { change: () => freamwork.setState({ todos: todos.map(t => t.id === todo.id ? { ...t, completed: !t.completed } : t) }) }
                                                     },
                                                     {
                                                         tag: 'label',
+                                                        attrs: {"data-testid": "todo-item-label"},
                                                         children: [todo.text || ''],
                                                         events: { dblclick: () => freamwork.setState({ editingId: todo.id }) }
                                                     },
                                                     {
                                                         tag: 'button',
-                                                        attrs: { class: 'destroy' },
+                                                        attrs: { class: 'destroy', "data-testid": "todo-item-button" },
                                                         events: { click: () => freamwork.setState({ todos: todos.filter(t => t.id !== todo.id) }) }
                                                     }
                                                 ]

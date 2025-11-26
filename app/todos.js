@@ -56,7 +56,7 @@ export function createTodoApp( filter) {
                       freamwork.setState({
                         todos: [
                           ...todos,
-                          { id: Date.now(), text: e.target.value.trim(), completed: false }
+                          { id: crypto.randomUUID(), text: e.target.value.trim(), completed: false }
                         ],
                         newTodoText: '' // reset input
                       });

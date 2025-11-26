@@ -14,9 +14,7 @@ function getNextExistingElement(newChildren, oldKeyedMap, i, el) {
   return null;
 }
 
-export function render(newTree, container, oldTree=null) { 
-  console.log(oldTree);
-  
+export function render(newTree, container, oldTree=null) {   
     updateElement(oldTree, newTree, container);
 }
 function updateElement(oldVNode, newVNode, parent) {

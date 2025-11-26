@@ -15,7 +15,7 @@ export function createTodoApp( filter) {
   });
 
   const handleEditInput = (e, todo) => {
-    if (e.key === 'Enter' && e.target.value.trim().length > 0) {
+    if (e.key === 'Enter' && e.target.value.trim().length > 1) {
       freamwork.setState({
         todos: todos.map(t => t.id === todo.id ? { ...t, text: e.target.value.trim() } : t),
         editingId: null
@@ -52,7 +52,7 @@ export function createTodoApp( filter) {
                     freamwork.setState({ newTodoText: e.target.value });
                   },
                   keydown: (e) => {
-                    if (e.key === 'Enter' && e.target.value.trim().length > 0) {
+                    if (e.key === 'Enter' && e.target.value.trim().length > 1) {
                       freamwork.setState({
                         todos: [
                           ...todos,
@@ -99,11 +99,13 @@ export function createTodoApp( filter) {
                       attrs: { class: 'edit', value: todo.text, autofocus: true },
                       events: {
                         mount: el => el.focus(),
-                        input: e => {
-                          const newText = e.target.value;
-                          freamwork.setState({ todos: todos.map(t => t.id === todo.id ? { ...t, text: newText } : t) });
+                        keydown: e => handleEditInput(e, todo),
+                        blur: e => {
+                          setTimeout(()=>{
+                            freamwork.setState({ editingId: null });
+                          },0)
                         },
-                        keydown: e => handleEditInput(e, todo)
+                        
                       }
                     }];
                   } else {

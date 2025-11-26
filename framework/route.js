@@ -1,5 +1,6 @@
 import { freamwork } from "./index.js";
 import { render } from "./render.js";
+import { notfound } from "../app/notfound.js";
 
 let isRenderScheduled = false;
 
@@ -7,10 +8,12 @@ function flushRouterRender() {
     isRenderScheduled = false;
     
     const path = window.location.hash.slice(2) || freamwork.defaultRoute || '';
-    const componentCreator = freamwork.routes[path];
+    const componentCreator = freamwork.routes[path] || notfound;
+    
     
     if (componentCreator) { 
-        freamwork.newDOM = componentCreator; 
+        freamwork.newDOM = componentCreator;
+         
         
         const newDom = freamwork.newDOM();
         
@@ -47,7 +50,7 @@ export const push = (path) => {
 }
 
 export function initRouter() {
-const component = freamwork.routes[window.location.hash.slice(2) || freamwork.defaultRoute]; ;
+const component = freamwork.routes[window.location.hash.slice(2)] || notfound ;
 if (component) {    
     freamwork.mount(component);
 }           

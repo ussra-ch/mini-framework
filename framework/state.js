@@ -5,44 +5,36 @@ let stateQueue = [];
 let isRendering = false;
 
 function flushStateQueue() {
-    if (isRendering) return; 
-
-    if (stateQueue.length > 0) {
-        isRendering = true;
-        
-        for (const update of stateQueue) {
-            freamwork.state = { 
-                ...freamwork.state, 
-                ...update 
-            };
+    if (isRendering || stateQueue.length === 0) return;
+    
+    isRendering = true;
+    
+    let nextState = { ...freamwork.state };
+    for (const updater of stateQueue) {
+        const update = typeof updater === 'function' ? updater(nextState) : updater;
+        if (!update || typeof update !== 'object') {
+            console.error("setState: Each update must be an object or a function returning an object.");
+            continue;
         }
-        
-        stateQueue = [];
-
-        const newVDom = freamwork.newDOM(); 
-        
-        render(newVDom, freamwork.parent, freamwork.OldDOM);
-        
-        freamwork.OldDOM = newVDom;
-        
-        isRendering = false;
+        nextState = { ...nextState, ...update };
     }
+    
+    stateQueue = [];
+    freamwork.state = nextState;
+    
+    const newVDom = freamwork.newDOM();
+    render(newVDom, freamwork.parent, freamwork.OldDOM);
+    freamwork.OldDOM = newVDom;
+    
+    isRendering = false;
 }
 
 export function setState(newStateOrFn) {
-    let newState;
-    if (typeof newStateOrFn === 'function') {
-        newState = newStateOrFn(freamwork.state);
-    } else {
-        newState = newStateOrFn;
-    }
-    if (!newState || typeof newState !== 'object') {
+    if (typeof newStateOrFn !== 'function' && (!newStateOrFn || typeof newStateOrFn !== 'object')) {
         console.error("setState: The new state must be an object or a function returning an object.");
-        return; 
+        return;
     }
-
-    stateQueue.push(newState);
-
-    setTimeout(flushStateQueue, 0); 
+    
+    stateQueue.push(newStateOrFn);
+    setTimeout(flushStateQueue, 0);
 }
-

@@ -4,7 +4,7 @@ import { freamwork } from "./index.js";
     return { tag, attrs, children, events };
   }
 
-  export const mount = (component) => {
+  export  function mount(component) {
    freamwork.newDOM = component
     const vDom = component()
    freamwork.OldDOM = vDom;
